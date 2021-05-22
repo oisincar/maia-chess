@@ -11,7 +11,8 @@ for i in {1000..2000..100}; do
     for f in ../data/lichess_raw/lichess_db_standard_rated_2017* ../data/lichess_raw/lichess_db_standard_rated_2018* ../data/lichess_raw/lichess_db_standard_rated_2019-{01..11}.pgn.bz2; do
         fname="$(basename -- $f)"
         echo "${i}-${fname}"
-        screen -S "${i}-${fname}" -dm bash -c "source ~/.bashrc; python3 ../data_generators/extractELOrange.py --remove_bullet --remove_low_time ${i} ${upperval} ${outputdir}/${fname} ${f}"
+        #screen -S "${i}-${fname}" -dm bash -c "source ~/.bashrc; python3 ../data_generators/extractELOrange.py --remove_bullet --remove_low_time ${i} ${upperval} ${outputdir}/${fname} ${f}"
+        python3 ../data_generators/replication-extractELOrange.py --remove_bullet --remove_low_time ${i} ${upperval} ${outputdir}/${fname} ${f}
     done
 done
 
