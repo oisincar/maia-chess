@@ -3,7 +3,8 @@
 
 mkdir ../data/elo_ranges
 cw=`pwd`
-for elo in {1100..1900..100}; do
+#for elo in {1100..1900..100}; do
+for elo in {1100}; do #{1100..1900..100}; do
     echo $i
     mkdir "../data/elo_ranges/${elo}"
     outputtest="../data/elo_ranges/${elo}/test"
@@ -16,7 +17,8 @@ for elo in {1100..1900..100}; do
         cd $outputtrain
         mkdir $fname
         cd $fname
-        screen -S "${elo}-${fname}-test" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 ${te}"
+        # screen -S "${elo}-${fname}-test" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 ${te}"
+        trainingdata-tool -v -files-per-dir 5000 ${te}
         cd ..
     done
     for te in "../data/final_training_data/pgns_ranged_testing/${elo}"/{1..2}.pgn; do
@@ -26,10 +28,11 @@ for elo in {1100..1900..100}; do
         mkdir $fname
         cd $fname
         echo "trainingdata-tool -v -files-per-dir 5000 ${te}"
-        screen -S "${elo}-${fname}-test" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 ${te}"
+        trainingdata-tool -v -files-per-dir 5000 ${te}
         cd ..
     done
-    te="../data/final_training_data/pgns_ranged_testing/${elo}/3.pgn"    fname="$(basename -- $te)"
+    te="../data/final_training_data/pgns_ranged_testing/${elo}/3.pgn"
+    fname="$(basename -- $te)"
     echo "${elo}-${fname}"
     cd $outputtest
     mkdir $fname
@@ -75,7 +78,7 @@ for elo in *; do
         echo "${year%.*.*}"
         mkdir "${year%.*.*}"
         cd "${year%.*.*}"
-        screen -S "${elo}-${year%.*.*}" -dm bash -c "bzcat \"../${year}\" | pgn-extract -7 -C -N  -#400000"
+        ${elo}-${year%.*.*}" -dm bash -c "bzcat \"../${year}\" | pgn-extract -7 -C -N  -#400000
         cd ..
     done
     cd ..
@@ -95,7 +98,7 @@ for elo in *; do
         mkdir -p "${yearonly}/1"
         cd "${yearonly}/1"
 
-        screen -S "${elo}-${yearonly}-test" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/1.pgn\""
+        trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/1.pgn\"
 
         cd ../../..
         cd train
@@ -105,7 +108,7 @@ for elo in *; do
             echo "${i}"
             mkdir -p "${i}"
             cd "${i}"
-            screen -S "${elo}-${yearonly}-train-${i}" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/${i}.pgn\""
+            trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/${i}.pgn\"
             cd ..
         done
         cd ../..
@@ -113,9 +116,9 @@ for elo in *; do
     cd ..
 done
 
-for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"test"* ]]; then echo $scr; screen -S $scr -X kill; fi; done
+# for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"test"* ]]; then echo $scr; screen -S $scr -X kill; fi; done
 
-for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"2200"* ]]; then echo $scr; screen -S $scr -X kill; fi; done
+# for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"2200"* ]]; then echo $scr; screen -S $scr -X kill; fi; done
 
 
-for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"final"* ]]; then echo $scr; screen -S $scr -X kill; fi; done
+# for scr in $(screen -ls | awk '{print $1}'); do if [[ $scr == *"final"* ]]; then echo $scr; screen -S $scr -X kill; fi; done

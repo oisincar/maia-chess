@@ -31,11 +31,12 @@ for i in {1000..2000..100}; do
         echo "${i}-${y}"
         mkdir $y
         cd $y
-        screen -S "${i}-${y}" -dm bash -c "source ~/.bashrc; bzcat \"../../../pgns_ranged_filtered/${i}/lichess_db_standard_rated_${y}\"* | pgn-extract -7 -C -N  -#200000"
+        # screen -S "${i}-${y}" -dm bash -c "source ~/.bashrc; bzcat \"../../../pgns_ranged_filtered/${i}/lichess_db_standard_rated_${y}\"* | pgn-extract -7 -C -N  -#200000"
+        bzcat \"../../../pgns_ranged_filtered/${i}/lichess_db_standard_rated_${y}\"* | pgn-extract -7 -C -N  -#200000
         cd ..
     done
     cd $cw
 done
 
 #Now we have all the pgns in blocks we can randomly sample and creat testing and training sets of 60 and 3 blocks respectively
-python3 move_training_set.py
+python3 replication-move_training_set.py
