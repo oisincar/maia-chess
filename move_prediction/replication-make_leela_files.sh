@@ -1,67 +1,71 @@
 #!/bin/bash
 
+set -e
 
-mkdir ../data/elo_ranges
+echo "HI"
+mkdir -p ../data/elo_ranges
 cw=`pwd`
-#for elo in {1100..1900..100}; do
-for elo in {1100}; do #{1100..1900..100}; do
+for elo in {1900..1901..100}; do
     echo $i
-    mkdir "../data/elo_ranges/${elo}"
+    mkdir -p "../data/elo_ranges/${elo}"
     outputtest="../data/elo_ranges/${elo}/test"
     outputtrain="../data/elo_ranges/${elo}/train"
-    mkdir $outputtest
-    mkdir $outputtrain
-    for te in "../data/final_training_data/pgns_ranged_training/${elo}"/*; do
+    mkdir -p $outputtest
+    mkdir -p $outputtrain
+    # for te in "../data/final_training_data/pgns_ranged_training/${elo}"/*; do
+    for te in "../data/pgns_ranged_training/${elo}"/*; do
+        echo $te
         fname="$(basename -- $te)"
         echo "${elo}-${fname}"
         cd $outputtrain
-        mkdir $fname
+        mkdir -p $fname
         cd $fname
         # screen -S "${elo}-${fname}-test" -dm bash -c "trainingdata-tool -v -files-per-dir 5000 ${te}"
-        trainingdata-tool -v -files-per-dir 5000 ${te}
-        cd ..
+        trainingdata-tool -files-per-dir 5000 ${te} &
+        cd $cw
     done
-    for te in "../data/final_training_data/pgns_ranged_testing/${elo}"/{1..2}.pgn; do
+    for te in "../data/pgns_ranged_testing/${elo}"/{1..2}.pgn; do
         fname="$(basename -- $te)"
         echo "${elo}-${fname}"
+        echo $(pwd)
         cd $outputtest
-        mkdir $fname
+        mkdir -p $fname
         cd $fname
-        echo "trainingdata-tool -v -files-per-dir 5000 ${te}"
-        trainingdata-tool -v -files-per-dir 5000 ${te}
-        cd ..
+        echo "trainingdata-tool -files-per-dir 5000 ${te}"
+        trainingdata-tool -files-per-dir 5000 ${te} &
+        cd $cw
     done
-    te="../data/final_training_data/pgns_ranged_testing/${elo}/3.pgn"
+    te="../data/pgns_ranged_testing/${elo}/3.pgn"
     fname="$(basename -- $te)"
     echo "${elo}-${fname}"
     cd $outputtest
-    mkdir $fname
+    mkdir -p $fname
     cd $fname
-    trainingdata-tool -v -files-per-dir 5000 ${te}
+    trainingdata-tool -files-per-dir 5000 ${te} &
     cd ..
 done
 cd $cw
 
 
-
+wait
 
 
 
 #After merging split pgns
-pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1200/lichess_1200.pgn
-pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1500/lichess_1500.pgn
-pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1800/lichess_1800.pgn
+# pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1200/lichess_1200.pgn
+# pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1500/lichess_1500.pgn
+# pgn-extract -7 -C -N  -#400000 /datadrive/pgns_ranged/1800/lichess_1800.pgn
 
 
 #Then on all the results
 
-trainingdata-tool -v -files-per-dir 5000 lichess_1800.pgn
-for f in *.pgn; do echo "${f%.*}"; mkdir "${f%.*}_files"; cd "${f%.*}_files"; trainingdata-tool -v -files-per-dir 5000 "../${f}"; cd ..; done
+# trainingdata-tool -files-per-dir 5000 lichess_1800.pgn
+for f in *.pgn; do echo "${f%.*}"; mkdir -p "${f%.*}_files"; cd "${f%.*}_files"; trainingdata-tool -files-per-dir 5000 "../${f}" &; cd ..; done
 
-for f in {1..10}.pgn; do echo "${f%.*}"; mkdir "${f%.*}_files"; cd "${f%.*}_files"; trainingdata-tool -v -files-per-dir 5000 "../${f}"; cd ..; done
+for f in {1..10}.pgn; do echo "${f%.*}"; mkdir -p "${f%.*}_files"; cd "${f%.*}_files"; trainingdata-tool -files-per-dir 5000 "../${f}" &; cd ..; done
 
-mkdir train
-mkdir test
+mkdir -p train
+mkdir -p test
 mv 10_files/ test/
 mv 10.pgn test/
 mv *_* train/
@@ -76,7 +80,7 @@ for elo in *; do
     cd $elo
     for year in *.pgn.bz2; do
         echo "${year%.*.*}"
-        mkdir "${year%.*.*}"
+        mkdir -p "${year%.*.*}"
         cd "${year%.*.*}"
         ${elo}-${year%.*.*}" -dm bash -c "bzcat \"../${year}\" | pgn-extract -7 -C -N  -#400000
         cd ..
@@ -98,7 +102,7 @@ for elo in *; do
         mkdir -p "${yearonly}/1"
         cd "${yearonly}/1"
 
-        trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/1.pgn\"
+        trainingdata-tool -files-per-dir 5000 \"../../../${year}/1.pgn\" # -v
 
         cd ../../..
         cd train
@@ -108,7 +112,7 @@ for elo in *; do
             echo "${i}"
             mkdir -p "${i}"
             cd "${i}"
-            trainingdata-tool -v -files-per-dir 5000 \"../../../${year}/${i}.pgn\"
+            trainingdata-tool -files-per-dir 5000 \"../../../${year}/${i}.pgn\" # -v
             cd ..
         done
         cd ../..
